@@ -1,0 +1,58 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: landiq-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: landiq
+      POSTGRES_PASSWORD: landiq
+      POSTGRES_DB: landiq
+    ports:
+      - "5432:5432"
+    volumes:
+      - landiq_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U landiq"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    container_name: landiq-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://landiq:landiq@postgres:5432/landiq
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000
+
+  dashboard:
+    build: .
+    container_name: landiq-dashboard
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://landiq:landiq@postgres:5432/landiq
+      API_URL: http://api:8000
+      PYTHONPATH: /app
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./models:/app/models
+    working_dir: /app
+    command: streamlit run dashboard/app.py --server.port 8501 --server.address 0.0.0.0
+
+volumes:
+  landiq_pgdata:
