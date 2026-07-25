@@ -47,13 +47,15 @@ def build_map(geojson: dict[str, Any], height: int = 550) -> folium.Map:
             heat_data.append([coords[1], coords[0], dev_index / 100.0])
 
     if heat_data:
-        HeatMap(
-            heat_data,
-            min_opacity=0.25,
-            radius=25,
-            blur=20,
-            gradient={0.2: "#3b82f6", 0.5: "#f59e0b", 0.8: "#10b981", 1.0: "#ffffff"},
-            name="Development Intensity",
+      for lat, lon, weight in heat_data:
+        folium.Circle(
+            location=[lat, lon],
+            radius=300 + (weight * 900),
+            color=None,
+            fill=True,
+            fill_color="#ff6b35",
+            fill_opacity=0.18 + (weight * 0.22),
+            popup=f"Development Score: {weight * 100:.0f}"
         ).add_to(folium_map)
 
     for feature in geojson.get("features", []):
