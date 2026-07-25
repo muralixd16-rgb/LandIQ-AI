@@ -7,6 +7,16 @@ whether to hold or sell their property based on the same signals.
 > *"You can't afford Hitech City — so where should you invest today that
 > becomes the next Hitech City?"*
 
+
+## 🚀 Live Demo
+
+🌐 **Dashboard:** https://landiq-dashboard.onrender.com/
+
+⚡ **API:** https://landiq-api.onrender.com/
+
+📚 **API Documentation:** https://landiq-api.onrender.com/docs
+
+
 ## Architecture — Postgres Only Stack
 
 | Layer              | Technology                              |
